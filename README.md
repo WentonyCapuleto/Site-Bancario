@@ -121,7 +121,7 @@ Todos os dados utilizados durante os testes devem ser fictícios.
 Desenvolvedor Full Stack
 
 - 💼 LinkedIn: https://www.linkedin.com/in/wentony-oliveira-750533193/
-- 🐙 GitHub: https://github.com/SEU-USUARIO
+- 🐙 GitHub: https://github.com/WentonyCapuleto
 
 ---
 
