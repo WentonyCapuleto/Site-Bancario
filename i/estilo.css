@@ -1,0 +1,569 @@
+:root{--itau-orange:#ff6a00;--itau-orange-dark:#e75a00;--white:#fff;--text:#111;--nav-height:64px;--container-width: 1280px;--container-padding: 22px; }
+/* ===== Ajustes para comportamento consistente de modais ===== */
+/* Força exibição baseada em aria-hidden (JS pode usar atributo apenas) */
+.modal-wrapper[aria-hidden="false"],
+.custom-modal[aria-hidden="false"] {
+  display: flex !important;
+}
+
+/* Quando hidden explicitamente */
+.modal-wrapper[aria-hidden="true"],
+.custom-modal[aria-hidden="true"] {
+  display: none !important;
+}
+
+/* Equilibrar z-index para que o modal principal (#modal-acessos) fique acima dos pequenos custom */
+.modal-wrapper { z-index: 9999; }        /* principal agora sobrepõe outros elementos */
+.custom-modal { z-index: 9900; }         /* pequenos modais abaixo do modal-wrapper */
+
+/* Remove margem excessiva no botão do modal (corrige posicionamento) */
+.modal-primary { margin-left: 0; }
+
+/* Tornar a nota/aviso (modal-note) visível por padrão com espaço */
+.modal-note { display:block; margin-bottom:10px; font-size:13px; color:#333; font-weight:600; }
+
+/* Foco mais visível em inputs e botões (útil dentro de modais em fundos claros) */
+input:focus, textarea:focus, button:focus, a:focus {
+  outline: 3px solid rgba(0, 102, 204, 0.18); /* azul claro visível em fundos brancos */
+  outline-offset: 2px;
+}
+
+/* Suporte: permitir estilo por aria-selected caso o script só altere atributo */
+.tab[aria-selected="true"], .tab.active {
+  background: var(--itau-orange);
+  color: var(--white);
+  border-color: var(--itau-orange);
+}
+
+/* Se algo estiver usando .hidden, garanta que aria-hidden também seja coerente (visual) */
+.hidden[aria-hidden="false"] { display:block !important; }
+
+/* Pequeno ajuste para garantir overlay centralizado */
+.modal-wrapper, .custom-modal { align-items: center; justify-content: center; padding: 12px; }
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;margin:0;color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+/* NAV */
+.itau-nav{background:var(--itau-orange);color:var(--white);box-shadow:0 2px 0 rgba(0,0,0,0.04)}
+.nav-inner{max-width:1140px;margin:0 auto;padding:12px 26px;display:flex;align-items:center;gap:22px;height:var(--nav-height)}
+.brand .logo{color:var(--white);font-weight:800;font-size:22px;text-decoration:none;text-transform:lowercase;padding:6px 10px;background:rgba(255,255,255,0.12);border-radius:8px}
+/* LINKS */
+.nav-links{list-style:none;display:flex;gap:30px;margin:0 0 0 20px;padding:0;align-items:center}
+.nav-links a{color:var(--white);text-decoration:none;font-weight:600;font-size:15px;letter-spacing:0.2px}
+/* INLINE FIELDS */
+.nav-actions{margin-left:auto;display:flex;gap:12px;align-items:center}
+.field-inline{display:flex;align-items:center;gap:8px;background:transparent;padding:6px 8px;border-radius:10px}
+.label-inline{color:var(--white);font-weight:700;font-size:13px;opacity:0.95}
+.field-inline input{width:92px;padding:8px 10px;border-radius:8px;border:0;background:rgba(255,255,255,0.96);color:var(--itau-orange);font-weight:400;text-align:center;font-size:14px;box-shadow:inset 0 -1px 0 rgba(0,0,0,0.02)}
+/* lock icon (square background like print) */
+.lock-wrap{width:44px;height:44px;background:rgba(255,255,255,0.95);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-left:6px}
+.lock-icon{width:28px;height:28px}
+/* BUTTONS */
+.btn{border-radius:10px;padding:9px 14px;font-weight:700;border:0;cursor:pointer;font-size:14px}
+.btn.small{padding:8px 10px;border-radius:8px}
+.btn.ghost{color:var(--white);border:1px solid rgba(255,255,255,0.14)}
+.btn.primary{background: transparent;color: #ffffff;box-shadow: 1px 1px 2px 2px rgb(255 255 255);}
+.plus-btn{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px}
+.plus{font-size:18px;line-height:1}
+.plus-btn .txt{font-weight:700;color:var(--white);opacity:0.95}
+/* MOBILE */
+.menu-toggle{display:none}
+.hamburger{display:none;width:36px;height:30px;cursor:pointer;margin-left:8px}
+.hamburger span{display:block;height:3px;background:var(--white);margin:5px 0;border-radius:3px}
+/* Mobile menu panel */
+.mobile-menu{display:none;background:var(--itau-orange-dark)}
+.mobile-menu ul{list-style:none;margin:0;padding:12px}
+.mobile-menu a{display:block;padding:12px;color:var(--white);text-decoration:none}
+.mobile-cta a{background:var(--white);color:var(--itau-orange);border-radius:8px;padding:10px}
+/* MODAL */
+.modal-wrapper{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1500;background:rgba(0,0,0,0.35)}
+.modal{background:var(--white);width:380px;max-width:94%;padding:22px;border-radius:12px;box-shadow:0 30px 60px rgba(0,0,0,0.28);position:relative}
+.close-modal{position:absolute;right:12px;top:10px;background:none;border:0;font-size:20px;cursor:pointer}
+.modal-title{margin:4px 0 14px 0;font-size:18px;font-weight:800}
+.access-tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{flex:1;padding:8px 10px;border-radius:8px;background:#f5f5f5;border:1px solid #eee;font-weight:700;cursor:pointer}
+.tab.active{background:var(--itau-orange);color:var(--white);border-color:var(--itau-orange)}
+.modal-body{display:flex;flex-direction:column;gap:12px}
+.modal-input{display:flex;flex-direction:column}
+.modal-input span{font-weight:700;margin-bottom:6px}
+.modal-input input{padding:12px;border-radius:8px;border:1px solid #e6e6e6;font-size:15px;text-align:center}
+.modal-primary{background:var(--itau-orange);color:var(--white);border:0;padding:12px;border-radius:8px;font-weight:800; margin-left: 8em;}
+.full{width:100%}
+.hidden{display:none}
+/* focus states */
+input:focus,button:focus,a:focus{outline:3px solid rgba(255,255,255,0.14);outline-offset:2px}
+/* ---------- HERO CAROUSEL (mini control integrated) ---------- */
+.hero-carousel{width:100%;background:#f3f3f3;display:block}
+.hero-container{margin:0 auto;position:relative;width:100%;aspect-ratio:1080/350;max-height:960px;overflow:hidden;background:#ff6a00}
+.slides{position:relative;width:100%;height:100%}
+.slide{position:absolute;inset:0;opacity:0;transform:translateX(6px);transition:opacity .6s ease, transform .6s ease;will-change:opacity, transform}
+.slide img{width:100%;height:100%;object-fit:cover;display:block}
+.slide.active{opacity:1;transform:none;z-index:2}
+/* MINI controls (pixel-precise) */
+.mini-carousel-controls{position:absolute;left:285px;bottom:30px;display:flex;align-items:center;gap:12px;z-index:20;height:36px;min-width:120px}
+.mini-arrow{display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;background:transparent;border:0;cursor:pointer}
+.mini-arrow svg{display:block}
+.mini-arrow:active{transform:scale(.98)}
+.mini-dots{display:flex;gap:4px;align-items:center}
+.mini-dots button{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.22);padding:0;cursor:pointer;transition:transform .15s, background .15s}
+.mini-dots button.active{background:#fff;transform:scale(1.25);box-shadow:0 2px 6px rgba(0,0,0,0.18)}
+/* ===== Solutions row — 6 cards em uma única fileira ===== */
+.solutions-section{padding:28px 0;background:#fff}
+.container{max-width:1440px;margin:0 auto;padding:0 48px}
+.solutions-title{font-size:16px;font-weight:700;margin:0 0 16px;color:#111}
+/* Agora 6 colunas, todas iguais */
+.solutions-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+/* ===== CARD ===== */
+.solution-card{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;gap:12px;padding:22px 12px;background:#fff;border:1px solid #e6e6e6;border-radius:12px;text-decoration:none;color:#000;transition:background .14s ease,border-color .14s ease,transform .14s ease,box-shadow .14s ease;cursor:pointer;min-height:150px}
+.sc-icon{width:48px;height:48px;background:#fafafa;border-radius:10px;border:1px solid #f0f0f0;display:flex;align-items:center;justify-content:center}
+.sc-body{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sc-title{font-weight:800;font-size:14px;color:#000}
+.sc-desc{font-size:13px;color:#000;opacity:.6;margin-top:4px}
+.sc-chevron{display:none}
+.solution-card:hover{border-color:var(--itau-orange);background:#f2f2f2;transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.08)}
+.solution-card:hover .sc-title,.solution-card:hover .sc-desc{color:#000}
+/* ===== PRODUCTS 1 + 4 layout (pixel-precise) ===== */
+.products-section{padding:40px 0 48px;background:#fff}
+.products-title{font-size:18px;font-weight:800;margin:0 0 6px;color:#111}
+.products-subtitle{color:#555;font-size:14px;margin:0 0 18px}
+.products-layout{display:flex;flex-direction:column;gap:20px;align-items:stretch}
+.product-card{display:flex;align-items:stretch;gap:22px;background:#fff;border-radius:12px;border:1px solid #e6e6e6;padding:20px;text-decoration:none;color:#000;transition:border-color .16s, background .16s, transform .16s, box-shadow .16s;box-shadow:0 4px 14px rgba(0,0,0,0.04)}
+.product-card .product-info{flex:1;display:flex;flex-direction:column;justify-content:center}
+.product-card .product-image{flex:0 0 300px;display:flex;align-items:center;justify-content:center}
+.product-card .product-image img{width:280px;height:160px;object-fit:cover;border-radius:10px}
+/* large variant */
+.product-card.large{min-height:190px;padding:24px}
+.product-card.large .product-image img{width:360px;height:180px}
+/* small grid container */
+.small-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+/* small cards */
+.product-card.small{padding:16px;min-height:140px;align-items:stretch}
+.product-card.small .product-image{flex:0 0 120px}
+.product-card.small .product-image img{width:150px;height:150px;object-fit:cover;border-radius:8px}
+/* text + tag + button */
+.product-tag{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;display:inline-block;margin-bottom:8px}
+.product-name{font-size:16px;font-weight:800;margin:0 0 8px;color:#111}
+.product-desc{font-size:14px;color:#444;margin:0 0 12px;line-height:1.3}
+.product-btn{padding:8px 14px;border-radius:8px;border:0;font-weight:700;cursor:pointer;background:#ff6a00;color:#fff;width:fit-content}
+.product-card:hover,.product-card:focus{border-color:var(--itau-orange);background:#f2f2f2;transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,0.06)}
+.product-card:hover .product-name,.product-card:hover .product-desc,.product-card:hover .product-tag{color:#111}
+/* ===================== SEGUNDA PARTE — CSS ===================== */
+.cards-credit-section{padding:40px 0}
+.cards-credit-title{font-size:15px;font-weight:700;margin-bottom:18px;color:#111}
+.cards-credit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.credit-card{display:flex;flex-direction:column;justify-content:space-between;background:#fff;border:1px solid #e6e6e6;border-radius:10px;padding:12px;text-decoration:none;color:#000;min-height:220px;transition:.15s ease;box-shadow:0 4px 12px rgba(0,0,0,0.04)}
+.credit-card img{width:100%;height:226px;border-radius:8px;object-fit:cover}
+.credit-card:hover{border-color:#ff6a00;background:#fafafa;transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,0.06)}
+.cc-cta{font-size:13px;font-weight:700;color:#0008ff}
+/* PROMO BANNER */
+.promo-banner-section{padding:20px 0}
+.promo-banner{display:flex;gap:20px;align-items:center;background:#000;border-radius:12px;overflow:hidden;padding:20px}
+.promo-panel{background:rgba(0,0,0,0.35);padding:18px;border-radius:8px;color:#fff;flex:1}
+.promo-tag{font-size:12px;opacity:.9}
+.promo-panel h3{margin:6px 0;font-size:20px;font-weight:800}
+.promo-panel p{margin:6px 0 14px;font-size:14px}
+.promo-btn{background:#ff6a00;color:#fff;border:0;padding:10px 16px;border-radius:8px;font-weight:800}
+.promo-visual{position:relative;width:320px;display:flex;align-items:center;justify-content:center;overflow:visible}
+.promo-visual img{display:block;width:580px;height:160px;object-fit:cover;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.12)}
+.promo-reflection{position:absolute;left:0;right:0;bottom:-10px;height:72px;margin:0 auto;width:320px;background-image:url('/mnt/data/2.png');background-size:cover;background-position:center;transform-origin:center top;transform:scaleY(-1);filter:blur(1px) saturate(0.95);opacity:0.28;border-radius:10px;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(to bottom, rgba(0,0,0,0.65), rgba(0,0,0,0.15) 35%, rgba(0,0,0,0));mask-image:linear-gradient(to bottom, rgba(0,0,0,0.65), rgba(0,0,0,0.15) 35%, rgba(0,0,0,0))}
+.promo-visual::after{content:"";position:absolute;left:12px;right:12px;bottom:-6px;height:6px;border-radius:4px;background:linear-gradient(90deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02));z-index:1;pointer-events:none}
+/* FINANCE CARDS */
+.finance-content-section{padding:40px 0}
+.section-subline{display:flex;align-items:center;gap:8px;color:#ff6a00;font-size:13px;margin-bottom:10px}
+.finance-title{font-size:15px;font-weight:700;margin-bottom:14px}
+.finance-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.finance-card{background:#fff;border:1px solid #e6e6e6;border-radius:10px;overflow:hidden;text-decoration:none;color:#000;transition:.15s ease}
+.finance-card img{width:100%;height:140px;object-fit:cover}
+.finance-card:hover{border-color:#ff6a00;background:#fafafa;transform:translateY(-4px)}
+.fc-body{padding:12px}
+.fc-body h4{font-size:15px;margin:0 0 6px;font-weight:800}
+.fc-body p{font-size:13px;color:#555;margin:0 0 10px}
+.fc-cta{color:#0047ff;font-weight:700}
+/* APPS */
+.apps-section{padding:40px 0;text-align:center}
+.apps-title{font-size:16px;font-weight:800;margin-bottom:6px}
+.apps-desc{font-size:13px;margin-bottom:20px;color:#666}
+.apps-box{display:flex;gap:18px;align-items:center;background:#fff;border-radius:12px;border:1px solid #e6e6e6;padding:22px;justify-content:space-between}
+.apps-icons{display:flex;flex-wrap:wrap;gap:12px;width:60%}
+.app-item{width:88px;height:72px;background:#fff;border:1px solid #eee;border-radius:10px;display:flex;justify-content:center;align-items:center;font-weight:800}
+.apps-visual img{width:220px;height:auto;object-fit:cover}
+.apps-cta{margin-top:18px;background:#ff6a00;color:#fff;padding:10px 28px;border-radius:10px;border:0;font-weight:800;cursor:pointer}
+/* MAPA */
+.map-section{padding:40px 0}
+.map-title{font-size:16px;font-weight:800;margin-bottom:6px}
+.map-desc{font-size:13px;margin-bottom:20px;color:#666}
+.map-grid{display:flex;gap:20px}
+.map-box img{width:100%;height:220px;border-radius:12px;object-fit:cover}
+.map-panel{width:360px}
+.map-form{display:flex;gap:8px}
+.map-form input{flex:1;height:44px;padding:0 12px;border-radius:8px;border:1px solid #ddd}
+.map-btn{height:44px;padding:0 16px;background:#ff6a00;border:0;color:#fff;border-radius:8px;cursor:pointer}
+/* ===================== CENTRALIZAÇÃO GERAL (exceto menu e hero) ===================== */
+section:not(.hero):not(.itau-nav){width:100%;display:flex;justify-content:center}
+.container{width:100%;max-width:1140px;margin:0 auto;padding:0 48px;box-sizing:border-box}
+/* AJUSTE EXTRA PARA SEÇÕES QUE POSSAM NÃO CONTER .container */
+.products-showcase>*:not(.container),.cards-credit-section>*:not(.container),.promo-banner-section>*:not(.container),.finance-content-section>*:not(.container),.apps-section>*:not(.container),.map-section>*:not(.container){width:100%;max-width:1140px;padding:0 48px;margin:0 auto}
+
+/* container (assuma hero já full-width) */
+.hero-left-ctrl{
+  width:var(--hero-left-width);
+  padding-left:92px;              /* posicionamento horizontal idêntico ao print */
+  padding-top:84px;               /* distancia do topo do hero (ajuste se necessário) */
+  box-sizing:border-box;
+  color:var(--white);
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+}
+
+/* Título — dividido em duas linhas conforme imagem */
+.hero-left-title{
+  margin:0;
+  color:var(--white);
+  font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-weight:800;
+  font-size:34px;                /* tamanho próximo ao print */
+  line-height:1.25;              /* empilhamento denso igual ao print */
+  letter-spacing:0.2px;
+  max-width:420px;
+  text-wrap:normal;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* CTA branco borda fina arredondada */
+.hero-cta{
+  display:inline-block;
+  width:140px;
+  text-align:center;
+  text-decoration:none;
+  color:var(--white);
+  font-weight:800;
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.9);
+  padding:10px 16px;
+  border-radius:10px;
+  font-size:16px;
+  box-shadow:0 2px 0 rgba(0,0,0,0.08);
+}
+
+/* hover e foco no botão */
+.hero-cta:hover,
+.hero-cta:focus{
+  background:rgba(255,255,255,0.06);
+  transform:translateY(-2px);
+  outline:none;
+}
+
+.hero-cta:focus{
+  outline:3px solid rgba(255,255,255,0.12);
+  outline-offset:2px;
+}
+
+/* ===== Correção: coluna esquerda sobre o slide (texto visível) ===== */
+.slide { position: absolute; inset: 0; display:block; }
+.slide img { display:block; width:100%; height:100%; object-fit:cover; z-index:1; position:relative; }
+
+/* posiciona a coluna esquerda sobre a imagem */
+.slide .hero-left-ctrl {
+  position: absolute;
+  top: 80px;                /* ajuste vertical — igual ao que você já usava */
+  left: 200px;               /* ajuste horizontal */
+  width: 460px;             /* controla largura da coluna de texto */
+  z-index: 10;              /* acima da imagem */
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  pointer-events: auto;     /* permite clicar nos botões/links */
+}
+
+/* força o título e o botão em primeiro plano e legíveis */
+.hero-left-title {
+  color: #fff !important;
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 1.25;
+  text-shadow: 0 6px 18px rgba(0,0,0,0.55); /* garante leitura sobre imagens escuras/clara */
+  z-index: 12;
+}
+
+/* botão/anchor visível e com sombra para contraste */
+.hero-left-ctrl .hero-cta,
+.hero-left-ctrl a.hero-cta {
+  display: inline-block;
+  color: #fff !important;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.9);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 500;
+  text-decoration: none;
+  z-index: 12;
+  text-shadow: none;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+}
+
+/* se houver <button><a> inválido no HTML, faça o <a> assumir todo o clique */
+.hero-left-ctrl button,
+.hero-left-ctrl button a { all: unset; display:inline-block; cursor:pointer; }
+
+/* mini controls (dots/arrows) ficam abaixo do CTA na mesma coluna */
+.hero-left-ctrl .hero-mini-controls {
+  margin-top: 8px;
+  z-index: 12;
+}
+
+/* pequena proteção: evita que a imagem sobreponha por qualquer transform */
+.slide img { transform: none; }
+
+/* Footer pixel-perfect based on provided image */
+.itau-footer{background:#3d3d3d;color:#ffffff;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;line-height:1.45}
+.itau-footer a{color:inherit;text-decoration:none;opacity:0.95}
+.itau-footer .container{max-width:1140px;margin:0 auto;padding:28px 24px;box-sizing:border-box}
+
+/* top area */
+.footer-top{padding-top:8px;padding-bottom:18px}
+.top-note{margin:0 0 12px;font-size:15px;font-weight:600}
+.sep{border:0;border-top:1px solid rgba(255,255,255,0.08);margin:12px 0 18px}
+
+/* grid layout */
+.footer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;align-items:start}
+.footer-grid .col h4{font-size:16px;margin:0 0 12px;font-weight:800}
+.footer-grid ul{list-style:none;padding:0;margin:0}
+.footer-grid li{margin:8px 0}
+.footer-grid li a{font-size:14px;color:#e6e6e6;display:inline-block}
+
+/* accessibility link small icon spacing */
+.accessibility{display:inline-flex;gap:8px;align-items:center}
+
+/* contact column specifics */
+.col.contact .social{display:flex;gap:10px;margin:8px 0 14px}
+.col.contact .social .s{width:34px;height:34px;border-radius:6px;background:rgba(255,255,255,0.06);display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px}
+.badges{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.badge img{width:140px;height:auto;border-radius:8px;display:block;object-fit:contain;box-shadow:0 2px 0 rgba(0,0,0,0.25)}
+
+/* bottom area */
+.footer-bottom{background:#2f2f2f;padding:18px 0;margin-top:18px;border-top:1px solid rgba(0,0,0,0.12)}
+.bottom-row{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.left .intl{display:inline-flex;align-items:center;gap:8px;font-weight:700}
+.right .legal{margin:0;text-align:right;font-size:13px;color:#eaeaea}
+.right .legal a{display:inline-block;color:#eaeaea;opacity:0.95}
+
+.lock-submit {
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lock-submit svg {
+  width: 25px;
+  height: 25px;
+  transition: transform 0.18s ease;
+}
+
+/* efeito itaú */
+.lock-submit:hover svg {
+  transform: translateX(2px);
+}
+
+/* modal genérico mínimo */
+.custom-modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); z-index: 9999; }
+.custom-modal[aria-hidden="false"] { display: flex; }
+.custom-modal-content { background: #fff; padding: 20px; width: 320px; max-width: 92%; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,.3); }
+.custom-modal-close { background: none; border: 0; font-size: 22px; float: right; cursor: pointer; }
+.custom-modal h3 { margin: 0 0 14px 0; font-size: 16px; font-weight:600; }
+.custom-modal input { width: 100%; padding: 10px 12px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 15px; }
+.custom-modal .ac-row { display:flex; gap:8px; }
+.custom-modal .ac-row input { flex:1; }
+.custom-modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:6px; }
+.btn { padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#f6f6f6; cursor:pointer; }
+.btn.primary { background:transparent; color:#fff;}
+
+/* modal.css
+   Estilos específicos para todos os modais da página (modal-wrapper + custom-modal)
+   Produz aparência equivalente ao modal antigo (sombra, bordas arredondadas, botões, tabs, inputs).
+*/
+
+/* --- Visibilidade controlada por aria-hidden para compatibilidade JS --- */
+.modal-wrapper[aria-hidden="false"],
+.custom-modal[aria-hidden="false"] {
+  display: flex !important;
+}
+
+.modal-wrapper[aria-hidden="true"],
+.custom-modal[aria-hidden="true"] {
+  display: none !important;
+}
+
+/* Wrapper geral (overlay) */
+.modal-wrapper {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2500;
+  background: rgba(0,0,0,0.36);
+  padding: 16px;
+}
+
+/* Caixa do modal principal */
+.modal {
+  background: #ffffff;
+  width: 380px;
+  max-width: calc(100% - 40px);
+  padding: 20px 22px;
+  border-radius: 12px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.28);
+  position: relative;
+  color: #111;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* Botão fechar (x) */
+.close-modal {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  background: none;
+  border: 0;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: #444;
+  padding: 6px;
+  border-radius: 6px;
+}
+.close-modal:hover { background: rgba(0,0,0,0.04); }
+
+/* Título */
+.modal-title {
+  margin: 6px 0 14px 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #111;
+}
+
+/* Tabs de acesso */
+.access-tabs{ display:flex; gap:8px; margin-bottom:12px; }
+.tab{
+  flex:1;
+  padding:8px 10px;
+  border-radius:8px;
+  background:#f5f5f5;
+  border:1px solid #eee;
+  font-weight:700;
+  cursor:pointer;
+  text-align:center;
+  color:#222;
+}
+.tab[aria-selected="true"], .tab.active {
+  background: #ff6a00;
+  color: #fff;
+  border-color: #ff6a00;
+}
+
+/* Corpo do modal */
+.modal-body{ display:flex; flex-direction:column; gap:12px; }
+
+/* Inputs dentro do modal */
+.modal-input{ display:flex; flex-direction:column; }
+.modal-input span{ font-weight:700; margin-bottom:6px; color:#333; font-size:13px; }
+.modal-input input{
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #e6e6e6;
+  font-size:15px;
+  text-align:center;
+  background:#fff;
+  color:#111;
+  box-sizing:border-box;
+}
+
+/* Botões dentro do modal */
+.modal-primary{
+  background: #ff6a00;
+  color: #fff;
+  border: 0;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.btn.ghost { background: transparent; border: 1px solid rgba(0,0,0,0.08); padding: 10px 12px; border-radius:8px; cursor:pointer; }
+.full{ width:100%; display:inline-block; }
+
+/* Pequenos ajustes responsivos */
+@media (max-width:480px){
+  .modal { width: 92%; padding:16px; border-radius:10px; }
+  .modal-title { font-size:16px; }
+  .modal-input input{ padding:10px; font-size:14px; }
+}
+
+/* --- Estilos para os "sub-modais" (custom-modal) usados para validação rápida --- */
+.custom-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  z-index: 2400;
+  padding: 12px;
+}
+
+.custom-modal-content {
+  background: #ffffff;
+  padding: 18px;
+  width: 340px;
+  max-width: calc(100% - 40px);
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+  box-sizing: border-box;
+  color:#111;
+}
+
+.custom-modal-close {
+  background: none;
+  border: 0;
+  font-size: 22px;
+  float: right;
+  cursor: pointer;
+  color: #444;
+}
+.custom-modal h3{ margin: 0 0 12px 0; font-size:16px; font-weight:700; color:#111; }
+.custom-modal input{ width:100%; padding:10px 12px; margin-bottom:10px; border-radius:6px; border:1px solid #ddd; font-size:15px; box-sizing:border-box; text-align:center; }
+
+/* actions (confirm/cancel) */
+.custom-modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:6px; }
+.custom-modal .btn { padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#f6f6f6; cursor:pointer; }
+.custom-modal .btn.primary { background:#ff6a00; color:#fff; border-color:#ff6a00; }
+
+/* Acessibilidade: foco visível */
+.modal input:focus, .custom-modal input:focus, .modal button:focus, .custom-modal button:focus {
+  outline: 3px solid rgba(0,102,204,0.18);
+  outline-offset: 2px;
+}
+
+/* Garantia de sobreposição: modal principal acima de custom-modal */
+.modal-wrapper { z-index: 2500; }
+.custom-modal { z-index: 2400; }
+
+/* responsive */
+@media(max-width:1500px){.slide .hero-left-ctrl{top: 50px; left: 140px;} .mini-carousel-controls {left: 234px;bottom: 8px;}}
+@media(max-width:1400px){.slide .hero-left-ctrl{top: 26px; left: 30px;} .mini-carousel-controls {left: 130px;bottom: 8px;}}
+@media(max-width:1300px){.slide .hero-left-ctrl{top: 30px; left: 15px;} .mini-carousel-controls {left: 100px;bottom: 2px;}}
+@media(max-width:1200px){.solutions-grid{grid-template-columns:repeat(3,1fr)} .slide .hero-left-ctrl{top: 16px; left: -20px;}.mini-carousel-controls {left: 55px;bottom: 2px;} }
+@media(max-width:1100px){.product-card.large .product-image img{width:280px;height:150px}.product-card .product-image{flex:0 0 240px}  .slide .hero-left-ctrl{top: 0px; left: -20px; font-size: 20px;} .hero-left-title{font-size: 20px;}.mini-carousel-controls {left: 66px;bottom: -6px;}}
+@media(max-width:980px){.nav-links{display:none}.field-inline{display:none}.lock-wrap{display:none}.plus-btn{display:block}.btn.primary{display:block}.hamburger{display:block}.nav-inner{padding:10px} .footer-grid{grid-template-columns:repeat(2,1fr);gap:20px}.badge img{width:130px}.container{padding:20px}.hero-container{max-width:100%;aspect-ratio: 15 / 7;max-height:560px}.mini-carousel-controls{left:12px;bottom:12px}.hero-left-title{font-size:28px}.hero-cta{width:128px;font-size:15px}.slide .hero-left-ctrl { left: 28px; top: -50px; width: 320px; } .hero-left-title { font-size: 28px; text-shadow: 0 4px 12px rgba(0,0,0,0.5); }.hero-left-ctrl .hero-cta { padding:8px 14px; font-size:15px; } .slide .hero-left-ctrl{top: 0px; left: -20px; font-size: 20px;} .hero-left-title{font-size: 20px;}.mini-carousel-controls {left: 60px;bottom: 2px;}.slide .hero-left-ctrl {gap: 6px;}}
+@media(max-width:900px){.solutions-grid{grid-template-columns:repeat(2,1fr)}.product-card{flex-direction:column}.product-image{width:100%;flex:unset}.product-card.large{flex-direction:column;align-items:flex-start}.product-card.large .product-image{width:100%;display:block}.product-card.large .product-image img{width:100%;height:220px}.small-grid{grid-template-columns:repeat(2,1fr)}.product-card.small{flex-direction:row}.cards-credit-grid{grid-template-columns:repeat(2,1fr)}.finance-grid{grid-template-columns:repeat(2,1fr)}.apps-box{flex-direction:column}.map-grid{flex-direction:column}.map-panel{width:100%}.mini-carousel-controls {left: 60px;bottom: 2px;}}
+@media(max-width:750px){.solutions-grid{grid-template-columns:repeat(2,1fr)}.slide .hero-left-ctrl{top: -50px; left: -55px;} .hero-left-title{font-size: 20px;}.mini-carousel-controls {left: 30px;bottom: 2px;}}
+@media(max-width:600px){  .footer-grid{grid-template-columns:1fr;gap:18px}.bottom-row{flex-direction:column;align-items:flex-start}.right .legal{text-align:left;margin-top:12px}.badges{flex-direction:row}.badge img{width:110px}.solutions-grid{grid-template-columns:1fr}.sc-icon{flex:0 0 40px}.solution-card{padding:12px}.solutions-section{padding:20px 0}.products-layout{gap:14px}.product-card.large .product-image img{height:180px}.small-grid{grid-template-columns:1fr}.product-card.small{flex-direction:row;gap:12px}.cards-credit-grid{grid-template-columns:1fr}.finance-grid{grid-template-columns:1fr}.apps-icons{width:100%;justify-content:center}.hero-container{aspect-ratio: 25 / 12;} .hero-left-title {font-size: 15px;}.slide .hero-left-ctrl {top: -20px;}    .hero-left-ctrl .hero-cta {font-size: 10px;}.mini-carousel-controls {left: 25px;bottom: 2px;}}
+@media(max-width:520px){.hero-container{aspect-ratio:5/4;max-height:420px}.mini-arrow{width:24px;height:24px}.mini-dots button{width:7px;height:7px}.mini-carousel-controls {left: 20px;bottom: 2px;}}
+@media(max-width:500px){.solutions-grid{grid-template-columns:1fr}}
+@media(max-width:400px){.hero-container{aspect-ratio:2/2;}}
